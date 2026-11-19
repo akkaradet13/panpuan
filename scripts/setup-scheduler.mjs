@@ -29,8 +29,9 @@ const { access_token } = await applicationDefault().getAccessToken();
 const api = (url, init) =>
   fetch(`https://cloudscheduler.googleapis.com/v1/${url}`, { ...init, headers: { authorization: `Bearer ${access_token}`, "content-type": "application/json" } });
 
-let res = await api(`${name}?updateMask=schedule,timeZone,httpTarget,description,retryConfig`, { method: "PATCH", body: JSON.stringify(job) });
-if (res.status === 404) res = await api(`projects/${project}/locations/${region}/jobs`, { method: "POST", body: JSON.stringify(job) });
+// Create; if it already exists (409), update it. (PATCH on a missing job returns 403, not 404.)
+let res = await api(`projects/${project}/locations/${region}/jobs`, { method: "POST", body: JSON.stringify(job) });
+if (res.status === 409) res = await api(`${name}?updateMask=schedule,timeZone,httpTarget,description,retryConfig`, { method: "PATCH", body: JSON.stringify(job) });
 const out = await res.json();
 if (!res.ok) throw new Error(`${res.status} ${JSON.stringify(out.error ?? out)}`);
 console.log("scheduler job ready:", out.name, out.schedule, out.httpTarget.uri);
