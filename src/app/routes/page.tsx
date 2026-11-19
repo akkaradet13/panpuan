@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Icon } from "@/modules/core/Icon";
 import { RouteBrowser } from "@/modules/routes/RouteBrowser";
 import { listRoutes } from "@/modules/routes/routes";
 
@@ -15,10 +16,15 @@ export default async function RoutesPage() {
   const routes = await listRoutes();
   return (
     <main className="wrap stack">
-      <h1>เส้นทางปั่นจักรยานในอุบล</h1>
-      <Link href="/routes/new" className="btn">
-        + เพิ่มเส้นทาง (อัปโหลด GPX)
-      </Link>
+      <section className="card page-head">
+        <div>
+          <h1>คลังเส้นทางปั่นจักรยานอุบลราชธานี</h1>
+          <p>ข้อมูลระยะทาง ความชัน พื้นผิว รีวิว และดาวน์โหลด GPX ฟรี</p>
+        </div>
+        <Link href="/routes/new" className="btn">
+          <Icon name="upload" /> อัปโหลดเส้นทาง (.GPX)
+        </Link>
+      </section>
       <RouteBrowser routes={routes} />
     </main>
   );

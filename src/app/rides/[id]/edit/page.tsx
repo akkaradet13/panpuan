@@ -16,7 +16,7 @@ export default async function EditRidePage({ params }: PageProps<"/rides/[id]/ed
   if (!ride) notFound();
   const routes = await listRoutes();
   return (
-    <main className="wrap">
+    <main className="wrap narrow">
       <h1>แก้ไขทริป</h1>
       <p className="muted">ต้องการเปลี่ยนวันหรือเวลา ใช้ปุ่ม “เลื่อนทริป” ในหน้าทริป ระบบจะแจ้งทุกคนที่ลงชื่อ</p>
       <RideForm clubId={ride.club_id} ride={ride} routes={routes.map((r) => ({ id: r.id, name: r.name, distance_km: r.distance_km }))} />

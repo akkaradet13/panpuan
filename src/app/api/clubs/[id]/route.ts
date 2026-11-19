@@ -11,7 +11,7 @@ export function PATCH(req: Request, ctx: RouteContext<"/api/clubs/[id]">) {
     const { id } = await ctx.params;
     const input = parseClubInput(await readJson(req));
     const { slug } = await updateClub(id, actor, input);
-    await syncClubOnRides(id, { club_name: input.name }); // rides keep a copy of the club name
+    await syncClubOnRides(id, { club_name: input.name, club_district: input.district }); // rides keep copies
     revalidatePath("/clubs");
     revalidatePath(`/clubs/${slug}`);
     return { slug };

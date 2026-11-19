@@ -8,7 +8,7 @@ import { currentDeviceId, enablePush, registerToken, type EnableResult } from ".
 type State = "idle" | "busy" | "error" | EnableResult;
 
 /** "Turn on notifications" button. Never prompts on its own — only when tapped. */
-export function EnableNotifications() {
+export function EnableNotifications({ buttonClass = "btn btn-small" }: { buttonClass?: string }) {
   const user = useAuth();
   const [state, setState] = useState<State>("idle");
 
@@ -50,7 +50,7 @@ export function EnableNotifications() {
     default:
       return (
         <div className="row">
-          <button className="btn btn-small" onClick={onClick} disabled={state === "busy"}>
+          <button className={buttonClass} onClick={onClick} disabled={state === "busy"}>
             🔔 เปิดแจ้งเตือน
           </button>
           {state === "error" && <span className="error">เปิดไม่สำเร็จ ลองใหม่อีกครั้ง</span>}

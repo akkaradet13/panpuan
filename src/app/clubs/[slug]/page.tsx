@@ -69,7 +69,7 @@ export default async function ClubPage({ params }: PageProps<"/clubs/[slug]">) {
   };
 
   return (
-    <main className="wrap stack">
+    <main className="wrap narrow stack">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <nav className="crumbs muted">
         <Link href="/">หน้าแรก</Link> › <Link href="/clubs">กลุ่มปั่น</Link>

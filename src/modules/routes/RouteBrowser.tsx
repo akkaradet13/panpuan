@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { DISTRICTS } from "@/modules/core/districts";
+import { Icon } from "@/modules/core/Icon";
 import { DIFFICULTY, SURFACE, type Difficulty, type RouteSummary } from "./types";
 
 const DISTANCES = [
@@ -44,7 +45,7 @@ export function RouteBrowser({ routes, fixedDistrict }: { routes: RouteSummary[]
           ))}
         </select>
         <select aria-label="ความยาก" value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
-          <option value="">ทุกระดับ</option>
+          <option value="">ทุกระดับความยาก</option>
           {(Object.keys(DIFFICULTY) as Difficulty[]).map((d) => (
             <option key={d} value={d}>
               {DIFFICULTY[d]}
@@ -54,15 +55,13 @@ export function RouteBrowser({ routes, fixedDistrict }: { routes: RouteSummary[]
       </div>
 
       {shown.length === 0 ? (
-        <p className="muted">ยังไม่มีเส้นทางที่ตรงกับตัวกรอง</p>
+        <p className="empty">ยังไม่มีเส้นทางที่ตรงกับตัวกรอง</p>
       ) : (
-        <ul className="list">
+        <div className="grid-3">
           {shown.map((r) => (
-            <li key={r.id}>
-              <RouteCard r={r} />
-            </li>
+            <RouteCard key={r.id} r={r} />
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
@@ -70,13 +69,41 @@ export function RouteBrowser({ routes, fixedDistrict }: { routes: RouteSummary[]
 
 export function RouteCard({ r }: { r: RouteSummary }) {
   return (
-    <Link href={`/routes/${r.slug}`} className="card list-item">
-      <strong>{r.name}</strong>
-      {r.status === "unverified" && <span className="badge">ยังไม่ยืนยัน</span>}
-      <span className="muted">
-        {r.distance_km} กม.{r.elevation_gain_m ? ` · ขึ้น ${r.elevation_gain_m} ม.` : ""} · {DIFFICULTY[r.difficulty]} · {SURFACE[r.surface]} · อ.{r.district}
-        {r.rating_count > 0 && ` · ★ ${r.rating_avg.toFixed(1)} (${r.rating_count})`}
-      </span>
+    <Link href={`/routes/${r.slug}`} className="card route-card">
+      <div className="route-thumb">
+        {r.thumb && (
+          <svg viewBox="0 0 280 95" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <path d={r.thumb.d} fill="none" stroke="#FF6B00" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" opacity="0.35" />
+            <path d={r.thumb.d} fill="none" stroke="#8CE600" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx={r.thumb.x} cy={r.thumb.y} r="4" fill="#FF6B00" />
+          </svg>
+        )}
+        <span className="thumb-tag l">📍 อ.{r.district}</span>
+        {r.rating_count > 0 && (
+          <span className="thumb-tag r">
+            ★ {r.rating_avg.toFixed(1)} ({r.rating_count})
+          </span>
+        )}
+      </div>
+      <div className="route-body">
+        <h3>
+          {r.name}
+          {r.status === "unverified" && <span className="badge badge-warn">ยังไม่ยืนยัน</span>}
+        </h3>
+        <div className="chips">
+          <span className="chip" style={{ color: "var(--orange)", fontWeight: 700 }}>
+            {r.distance_km} km
+          </span>
+          {r.elevation_gain_m ? <span className="chip">⛰️ +{r.elevation_gain_m} m</span> : null}
+          <span className="chip">{DIFFICULTY[r.difficulty]}</span>
+        </div>
+        <p className="muted small" style={{ margin: 0 }}>
+          พื้นผิว: {SURFACE[r.surface]}
+        </p>
+        <span className="route-dl">
+          <Icon name="download" /> ดู & ดาวน์โหลด GPX
+        </span>
+      </div>
     </Link>
   );
 }

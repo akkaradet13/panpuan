@@ -63,7 +63,7 @@ export default async function RidePage({ params }: PageProps<"/rides/[id]">) {
   };
 
   return (
-    <main className="wrap stack">
+    <main className="wrap narrow stack">
       <JsonLd data={{ "@context": "https://schema.org", "@graph": [event, breadcrumbs([["หน้าแรก", "/"], ["ทริป", "/rides"], [r.title, `/rides/${r.id}`]])] }} />
       <nav className="crumbs muted">
         <Link href="/">หน้าแรก</Link> › <Link href="/rides">ทริป</Link>
@@ -80,10 +80,10 @@ export default async function RidePage({ params }: PageProps<"/rides/[id]">) {
         <div><dt>วัน</dt><dd>{dayLabel(start)}</dd></div>
         <div><dt>ออกปั่น</dt><dd>{fmtTime(start)} น.</dd></div>
         <div><dt>ความเร็ว</dt><dd>{r.pace_min_kmh}–{r.pace_max_kmh} กม./ชม.</dd></div>
-        <div><dt>แบบ</dt><dd>{DROP_POLICY[r.drop_policy]}</dd></div>
+        <div><dt>กติกา</dt><dd title={DROP_POLICY[r.drop_policy]}>{r.drop_policy === "no_drop" ? "No-Drop" : "Drop"}</dd></div>
       </dl>
 
-      <RideLive ride={r} afterJoin={<EnableNotifications />} />
+      <RideLive ride={r} afterJoin={<EnableNotifications buttonClass="btn btn-lime btn-small btn-block" />} />
 
       <section className="stack">
         <h2>จุดนัด: {r.meet_name}</h2>

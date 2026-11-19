@@ -86,7 +86,7 @@ export async function getClubBySlug(slug: string): Promise<Club | null> {
   return d && d.get("status") !== "suspended" ? toClub(d) : null;
 }
 
-export type ClubRef = { id: string; name: string; slug: string; status: Club["status"] };
+export type ClubRef = { id: string; name: string; slug: string; district: string; status: Club["status"] };
 
 /**
  * For other modules (rides): returns the club if the user is an active admin (or super admin) and the club is
@@ -95,7 +95,7 @@ export type ClubRef = { id: string; name: string; slug: string; status: Club["st
 export async function requireClubAdmin(clubId: string, actor: DecodedIdToken): Promise<ClubRef> {
   const [club, me] = await adminDb.getAll(clubs.doc(clubId), members.doc(memberId(clubId, actor.uid)));
   assertCanAdmin(club, me, actor);
-  return { id: club.id, name: club.get("name"), slug: club.get("slug"), status: club.get("status") };
+  return { id: club.id, name: club.get("name"), slug: club.get("slug"), district: club.get("district"), status: club.get("status") };
 }
 
 export async function getClub(id: string): Promise<Club | null> {

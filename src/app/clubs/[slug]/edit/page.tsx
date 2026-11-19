@@ -18,7 +18,7 @@ export default async function EditClubPage({ params }: PageProps<"/clubs/[slug]/
   const club = await getClubBySlug(slug);
   if (!club) notFound();
   return (
-    <main className="wrap">
+    <main className="wrap narrow">
       <h1>แก้ไขข้อมูลกลุ่ม</h1>
       <p className="muted">ลิงก์ของกลุ่มยังเหมือนเดิมแม้เปลี่ยนชื่อ · ข้อมูลใหม่ขึ้นหน้าเว็บภายในประมาณ 2 นาที</p>
       <ClubForm club={club} />

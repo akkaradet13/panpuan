@@ -37,7 +37,7 @@ export default async function RoutePage({ params }: PageProps<"/routes/[slug]">)
   const reviews = await listReviews(r.id);
 
   return (
-    <main className="wrap stack">
+    <main className="wrap narrow stack">
       <JsonLd data={{ "@context": "https://schema.org", ...breadcrumbs([["หน้าแรก", "/"], ["เส้นทาง", "/routes"], [r.name, `/routes/${r.slug}`]]) }} />
       <nav className="crumbs muted">
         <Link href="/">หน้าแรก</Link> › <Link href="/routes">เส้นทาง</Link> › <Link href={`/districts/${r.district}`}>อ.{r.district}</Link>

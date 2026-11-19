@@ -1,8 +1,41 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api, useAuth } from "./client-auth";
+import { Icon } from "./Icon";
 import type { UserProfile } from "./profile-options";
+
+/** Compact "copy my ICS link" button for the calendar page. */
+export function CopyIcsButton() {
+  const user = useAuth();
+  const [msg, setMsg] = useState("");
+  if (user === undefined) return null;
+  if (user === null) {
+    return (
+      <Link className="btn btn-ghost btn-small" href="/login?next=/rides">
+        <Icon name="link" /> เข้าสู่ระบบเพื่อซิงก์ปฏิทิน
+      </Link>
+    );
+  }
+  async function copy() {
+    try {
+      const { calendar_token } = await api<UserProfile>("/api/me");
+      await navigator.clipboard.writeText(`${location.origin}/api/cal/${calendar_token}.ics`);
+      setMsg("คัดลอกแล้ว ✅ วางใน Google Calendar → อื่น ๆ → จาก URL");
+    } catch {
+      setMsg("คัดลอกไม่สำเร็จ ดูลิงก์ได้ที่หน้าโปรไฟล์");
+    }
+  }
+  return (
+    <div className="stack" style={{ gap: 4, alignItems: "flex-start" }}>
+      <button className="btn btn-ghost btn-small" onClick={copy}>
+        <Icon name="link" /> คัดลอกลิงก์ ICS ส่วนตัว
+      </button>
+      {msg && <span className="muted small">{msg}</span>}
+    </div>
+  );
+}
 
 /** Personal ICS feed URL (secret) with copy and reset. */
 export function CalendarLink() {

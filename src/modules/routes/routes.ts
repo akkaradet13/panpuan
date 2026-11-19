@@ -6,6 +6,7 @@ import { isDistrict } from "@/modules/core/districts";
 import { adminBucket, adminDb } from "@/modules/core/firebase/admin";
 import { HttpError } from "@/modules/core/http";
 import { slugify } from "@/modules/core/clubs";
+import { decodePolyline } from "@/modules/core/polyline";
 import { getOrCreateUser } from "@/modules/core/users";
 import { gpxStats } from "./gpx";
 import { DIFFICULTY, SURFACE, type Difficulty, type Review, type Route, type RouteSummary, type Surface, type VerifyStatus } from "./types";
@@ -44,7 +45,24 @@ function toRoute(d: DocumentSnapshot): Route {
 const summary = (r: Route): RouteSummary => ({
   id: r.id, name: r.name, slug: r.slug, distance_km: r.distance_km, elevation_gain_m: r.elevation_gain_m,
   difficulty: r.difficulty, surface: r.surface, district: r.district, rating_avg: r.rating_avg, rating_count: r.rating_count, status: r.status,
+  thumb: thumbPath(r.polyline),
 });
+
+/** Route shape fitted into a 280×95 box, ≤ 80 points (~1 KB), so list pages don't ship full polylines. */
+function thumbPath(polyline: string): RouteSummary["thumb"] {
+  const all = decodePolyline(polyline);
+  if (all.length < 2) return null;
+  const step = Math.ceil(all.length / 80);
+  const pts = all.filter((_, i) => i % step === 0 || i === all.length - 1);
+  const lats = pts.map((p) => p[0]), lngs = pts.map((p) => p[1]);
+  const minLat = Math.min(...lats), maxLat = Math.max(...lats), minLng = Math.min(...lngs);
+  const cos = Math.cos((((minLat + maxLat) / 2) * Math.PI) / 180);
+  const w = (Math.max(...lngs) - minLng) * cos || 1e-9, h = maxLat - minLat || 1e-9;
+  const k = Math.min(260 / w, 75 / h);
+  const ox = (280 - w * k) / 2, oy = (95 - h * k) / 2;
+  const xy = pts.map(([lat, lng]) => [ox + (lng - minLng) * cos * k, oy + (maxLat - lat) * k]);
+  return { d: xy.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`).join(""), x: xy[0][0], y: xy[0][1] };
+}
 
 export type RouteInput = { name: string; description: string; difficulty: Difficulty; surface: Surface; district: string };
 

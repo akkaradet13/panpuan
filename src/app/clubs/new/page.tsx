@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function NewClubPage() {
   return (
-    <main className="wrap">
+    <main className="wrap narrow">
       <h1>สร้างกลุ่มปั่น</h1>
       <p className="muted">สร้างแล้วใช้งานได้ทันที คุณจะเป็นแอดมินคนแรกของกลุ่ม</p>
       <ClubForm />

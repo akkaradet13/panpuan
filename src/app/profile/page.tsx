@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function ProfilePage() {
   return (
-    <main className="wrap stack">
+    <main className="wrap narrow stack">
       <h1>โปรไฟล์ของฉัน</h1>
       <AdminLink />
       <ProfileForm />

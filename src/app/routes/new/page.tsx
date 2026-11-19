@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function NewRoutePage() {
   return (
-    <main className="wrap">
+    <main className="wrap narrow">
       <h1>เพิ่มเส้นทางปั่น</h1>
       <p className="muted">อัปโหลด GPX แล้วระบบคำนวณระยะทาง ความชัน และวาดแผนที่ให้เอง ใช้งานได้ทันที</p>
       <RouteForm />

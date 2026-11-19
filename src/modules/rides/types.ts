@@ -12,6 +12,7 @@ export type Ride = {
   club_id: string;
   club_name: string;
   club_slug: string;
+  club_district: string;
   club_status: string;
   route_id: string | null;
   route_name: string | null;
@@ -38,6 +39,13 @@ export type Participant = {
   photo_url: string;
   status: "going" | "waitlist";
 };
+
+export type PaceLevel = "chill" | "medium" | "fast";
+export const PACE_LABEL: Record<PaceLevel, string> = { chill: "ชิล (< 25 กม./ชม.)", medium: "กลาง (25–32)", fast: "เร็ว (33+)" };
+export function paceLevel(r: Pick<Ride, "pace_min_kmh" | "pace_max_kmh">): PaceLevel {
+  const avg = (r.pace_min_kmh + r.pace_max_kmh) / 2;
+  return avg < 25 ? "chill" : avg <= 32 ? "medium" : "fast";
+}
 
 /** A ride is over 12 h after it starts (computed on read, nobody has to close it). */
 export const DONE_AFTER_MS = 12 * 3600_000;

@@ -1,7 +1,7 @@
 // Self-checks for pure logic (GPX, polyline, Thai date/time). Run: node scripts/check.mjs
 import assert from "node:assert/strict";
 import { decodePolyline } from "../src/modules/core/polyline.ts";
-import { bangkokParts, bangkokToUtc, dayLabel, fmtDate, fmtTime } from "../src/modules/core/format.ts";
+import { bangkokParts, bangkokToUtc, dayLabel, fmtDate, fmtShortDate, fmtTime, nextDays } from "../src/modules/core/format.ts";
 import { elevationGainM, encodePolyline, gpxStats, parseGpx, simplify } from "../src/modules/routes/gpx.ts";
 import { buildIcs, gcalUrl, icsEscape, icsFold, rideHours } from "../src/modules/rides/ics.ts";
 
@@ -42,6 +42,8 @@ assert.equal(fmtDate(d), "เสาร์ 21 พ.ย. 2569");
 assert.equal(dayLabel(d, new Date("2026-11-20T03:00:00Z")), "พรุ่งนี้ · เสาร์ 21 พ.ย. 2569");
 assert.deepEqual(bangkokParts(d), { day: "2026-11-21", hour: 5, minute: 30 });
 assert.equal(fmtTime(bangkokToUtc("2026-11-21", 18, 0)), "18:00");
+assert.equal(fmtShortDate(d), "ส. 21 พ.ย.");
+assert.deepEqual(nextDays(2, new Date("2026-11-20T18:00:00Z")), [{ key: "2026-11-21", w: "ส.", d: 21 }, { key: "2026-11-22", w: "อา.", d: 22 }]);
 
 // ICS: escaping, UTF-8-safe folding, cancelled events, ride duration, Google Calendar link
 assert.equal(icsEscape("a,b;c\\d\ne"), "a\\,b\\;c\\\\d\\ne");

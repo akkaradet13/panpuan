@@ -8,6 +8,7 @@ import { api, useAuth } from "@/modules/core/client-auth";
 import { DateTimeSelect } from "@/modules/core/DateTimeSelect";
 import { db } from "@/modules/core/firebase/client";
 import { dayLabel, fmtTime } from "@/modules/core/format";
+import { Icon } from "@/modules/core/Icon";
 import { gcalUrl, rideHours } from "./ics";
 import { isDone, type Participant, type Ride } from "./types";
 
@@ -136,15 +137,33 @@ export function RideLive({ ride: initial, afterJoin }: { ride: Ride; afterJoin?:
       {msg && <p className="error">{msg}</p>}
 
       {justJoined && (
-        <div className="card stack">
-          <strong>✅ ลงชื่อแล้ว · อยากให้เตือนก่อนออกปั่นไหม?</strong>
-          {afterJoin}
+        <div className="action-banner" role="status">
+          <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-start", flexWrap: "nowrap" }}>
+            <div className="row" style={{ flexWrap: "nowrap", alignItems: "flex-start" }}>
+              <span className="ok">
+                <Icon name="check" />
+              </span>
+              <div>
+                <strong>ลงชื่อ “{ride.title}” แล้ว</strong>
+                <div className="muted small">อยากให้ระบบเตือนก่อนออกปั่นไหม?</div>
+              </div>
+            </div>
+            <button className="close" onClick={() => setJustJoined(false)} aria-label="ปิด">
+              <Icon name="x" />
+            </button>
+          </div>
+          <div className="row" style={{ flexWrap: "nowrap", alignItems: "stretch" }}>
+            <div className="grow">{afterJoin}</div>
+            <a className="btn btn-ghost btn-small grow" href={gcal} target="_blank" rel="noopener">
+              <Icon name="calendar" /> Google Calendar
+            </a>
+          </div>
         </div>
       )}
 
       {!cancelled && (
-        <a className="btn btn-ghost btn-small" href={gcal} target="_blank" rel="noopener">
-          📆 เพิ่มลง Google Calendar
+        <a className="btn btn-ghost btn-small" href={gcal} target="_blank" rel="noopener" style={{ alignSelf: "flex-start" }}>
+          <Icon name="calendar" /> เพิ่มลง Google Calendar
         </a>
       )}
 

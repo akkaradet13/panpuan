@@ -39,6 +39,25 @@ export function bangkokParts(d: Date) {
   return { day: s.slice(0, 10), hour: Number(s.slice(11, 13)), minute: Number(s.slice(14, 16)) };
 }
 
+// Fixed Thai abbreviations: ICU's "short" weekday varies ("พฤหัส" vs "พฤ.") between runtimes.
+const WD = ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."];
+const MON = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+const bkk = (d: Date) => new Date(d.getTime() + BKK_MS);
+
+/** "ส. 21 พ.ย." */
+export function fmtShortDate(d: Date) {
+  const b = bkk(d);
+  return `${WD[b.getUTCDay()]} ${b.getUTCDate()} ${MON[b.getUTCMonth()]}`;
+}
+
+/** Week strip cells starting today: { key: "YYYY-MM-DD", w: "ส.", d: 21 } */
+export function nextDays(n: number, now = new Date()) {
+  return Array.from({ length: n }, (_, i) => {
+    const d = new Date(now.getTime() + i * 86_400_000);
+    return { key: dayKey(d), w: WD[bkk(d).getUTCDay()], d: bkk(d).getUTCDate() };
+  });
+}
+
 /** Options for a Thai date <select>: today + the next n-1 days. */
 export function upcomingDays(n: number, now = new Date()) {
   return Array.from({ length: n }, (_, i) => {

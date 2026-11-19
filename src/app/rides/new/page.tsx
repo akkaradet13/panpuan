@@ -16,7 +16,7 @@ export default async function NewRidePage({ searchParams }: PageProps<"/rides/ne
   if (!club) notFound();
   const routes = await listRoutes();
   return (
-    <main className="wrap">
+    <main className="wrap narrow">
       <h1>สร้างทริปของ {club.name}</h1>
       <p className="muted">สร้างแล้วขึ้นปฏิทินรวมทันที สมาชิกลงชื่อและรับเตือนก่อนออกปั่นได้</p>
       <RideForm clubId={club.id} routes={routes.map((r) => ({ id: r.id, name: r.name, distance_km: r.distance_km }))} />

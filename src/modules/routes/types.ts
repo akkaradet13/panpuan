@@ -25,7 +25,10 @@ export type Route = {
   status: VerifyStatus;
 };
 
-export type RouteSummary = Pick<Route, "id" | "name" | "slug" | "distance_km" | "elevation_gain_m" | "difficulty" | "surface" | "district" | "rating_avg" | "rating_count" | "status">;
+export type RouteSummary = Pick<Route, "id" | "name" | "slug" | "distance_km" | "elevation_gain_m" | "difficulty" | "surface" | "district" | "rating_avg" | "rating_count" | "status"> & {
+  /** Small SVG path (viewBox 0 0 280 95) for card thumbnails, drawn from the polyline on the server. */
+  thumb: { d: string; x: number; y: number } | null;
+};
 
 export type Review = {
   uid: string;

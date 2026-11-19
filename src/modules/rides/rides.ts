@@ -20,6 +20,7 @@ function toRide(d: DocumentSnapshot): Ride {
     club_id: x.club_id,
     club_name: x.club_name,
     club_slug: x.club_slug,
+    club_district: x.club_district ?? "",
     club_status: x.club_status,
     route_id: x.route_id ?? null,
     route_name: x.route_name ?? null,
@@ -225,6 +226,7 @@ export async function createRide(createdBy: string, club: ClubRef, route: RouteR
     club_id: club.id,
     club_name: club.name,
     club_slug: club.slug,
+    club_district: club.district,
     club_status: club.status,
     ...detailFields(d, route),
     start_at: Timestamp.fromDate(start),
@@ -283,7 +285,7 @@ export async function changeRide(rideId: string, change: RideChange) {
 }
 
 /** Keeps denormalized club fields on rides in sync (club renamed, verified or suspended). */
-export async function syncClubOnRides(clubId: string, fields: { club_name?: string; club_status?: string }) {
+export async function syncClubOnRides(clubId: string, fields: { club_name?: string; club_district?: string; club_status?: string }) {
   const snap = await rides.where("club_id", "==", clubId).get();
   for (let i = 0; i < snap.docs.length; i += 450) {
     const batch = adminDb.batch();

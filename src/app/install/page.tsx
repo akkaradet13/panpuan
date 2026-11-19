@@ -36,7 +36,7 @@ const AddIcon = () => (
 
 export default function InstallPage() {
   return (
-    <main className="wrap stack">
+    <main className="wrap narrow stack">
       <h1>ติดตั้งแอปและเปิดแจ้งเตือน</h1>
       <p className="muted">ติดตั้งแล้วเปิดได้จากหน้าจอโฮมเหมือนแอปทั่วไป และรับแจ้งเตือนก่อนออกปั่นหรือเมื่อทริปเลื่อน/ยกเลิก</p>
 

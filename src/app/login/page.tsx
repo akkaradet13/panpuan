@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <main className="wrap">
+    <main className="wrap narrow">
       <h1>เข้าสู่ระบบ</h1>
       <p className="muted">ลงชื่อร่วมทริป เข้ากลุ่มปั่น และรับเตือนก่อนออกปั่น</p>
       <LoginPanel />
