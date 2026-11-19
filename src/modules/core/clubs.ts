@@ -181,6 +181,25 @@ export function parseMemberAction(body: unknown): MemberAction {
   return action as MemberAction;
 }
 
+/** Throws unless the actor is an active admin of a non-suspended club, or a super admin. */
+function assertCanAdmin(club: DocumentSnapshot, me: DocumentSnapshot, actor: DecodedIdToken) {
+  if (!club.exists) throw new HttpError(404, "ไม่พบกลุ่มนี้");
+  if (isSuperAdmin(actor)) return;
+  if (club.get("status") === "suspended") throw new HttpError(403, "กลุ่มนี้ถูกระงับ");
+  if (me.get("role") !== "admin" || me.get("status") !== "active") throw new HttpError(403, "เฉพาะแอดมินกลุ่มเท่านั้น");
+}
+
+/** Club admin edits club info. The slug never changes (stable URLs). */
+export async function updateClub(clubId: string, actor: DecodedIdToken, input: ClubInput) {
+  return adminDb.runTransaction(async (tx) => {
+    const clubRef = clubs.doc(clubId);
+    const [club, me] = await tx.getAll(clubRef, members.doc(memberId(clubId, actor.uid)));
+    assertCanAdmin(club, me, actor);
+    tx.update(clubRef, { ...input, updated_at: FieldValue.serverTimestamp() });
+    return { slug: club.get("slug") as string };
+  });
+}
+
 /** Club admin (or super admin) approves, promotes, demotes or removes a member. */
 export async function manageMember(clubId: string, actor: DecodedIdToken, targetUid: string, action: MemberAction) {
   if (targetUid === actor.uid && action !== "approve") throw new HttpError(400, "จัดการสิทธิ์ของตัวเองไม่ได้ ใช้ปุ่มออกจากกลุ่มแทน");
@@ -188,11 +207,7 @@ export async function manageMember(clubId: string, actor: DecodedIdToken, target
     const clubRef = clubs.doc(clubId);
     const targetRef = members.doc(memberId(clubId, targetUid));
     const [club, me, target] = await tx.getAll(clubRef, members.doc(memberId(clubId, actor.uid)), targetRef);
-    if (!club.exists) throw new HttpError(404, "ไม่พบกลุ่มนี้");
-    if (!isSuperAdmin(actor)) {
-      if (club.get("status") === "suspended") throw new HttpError(403, "กลุ่มนี้ถูกระงับ");
-      if (me.get("role") !== "admin" || me.get("status") !== "active") throw new HttpError(403, "เฉพาะแอดมินกลุ่มเท่านั้น");
-    }
+    assertCanAdmin(club, me, actor);
     if (!target.exists) throw new HttpError(404, "ไม่พบสมาชิกคนนี้");
 
     const role = target.get("role");

@@ -79,6 +79,11 @@ export function ClubMembership({ clubId, slug, joinPolicy }: Props) {
         {me?.status === "active" && (
           <>
             <span className="badge badge-ok">{isAdmin ? "คุณเป็นแอดมินกลุ่มนี้" : "เป็นสมาชิกแล้ว ✅"}</span>
+            {isAdmin && (
+              <Link className="btn btn-small" href={`/clubs/${slug}/edit`}>
+                แก้ไขข้อมูลกลุ่ม
+              </Link>
+            )}
             <button className="btn btn-ghost btn-small" disabled={busy} onClick={leave}>
               ออกจากกลุ่ม
             </button>

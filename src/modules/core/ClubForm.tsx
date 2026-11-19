@@ -3,18 +3,20 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api, useAuth } from "./client-auth";
-import { LINK_LABELS, type LinkKey } from "./club-types";
+import { LINK_LABELS, type Club, type LinkKey } from "./club-types";
 import { DISTRICTS } from "./districts";
 
-export function ClubForm() {
+/** Create a club, or edit one when `club` is given. */
+export function ClubForm({ club }: { club?: Club }) {
   const user = useAuth();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const here = club ? `/clubs/${club.slug}/edit` : "/clubs/new";
 
   useEffect(() => {
-    if (user === null) router.replace("/login?next=/clubs/new");
-  }, [user, router]);
+    if (user === null) router.replace(`/login?next=${encodeURIComponent(here)}`);
+  }, [user, router, here]);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -23,8 +25,8 @@ export function ClubForm() {
     setBusy(true);
     setError("");
     try {
-      const { slug } = await api<{ slug: string }>("/api/clubs", {
-        method: "POST",
+      const { slug } = await api<{ slug: string }>(club ? `/api/clubs/${club.id}` : "/api/clubs", {
+        method: club ? "PATCH" : "POST",
         body: JSON.stringify({
           name: get("name"),
           district: get("district"),
@@ -48,12 +50,12 @@ export function ClubForm() {
     <form className="card stack" onSubmit={submit}>
       <label>
         ชื่อกลุ่ม
-        <input name="name" required minLength={3} maxLength={80} placeholder="เช่น ชมรมจักรยานริมมูล" />
+        <input name="name" required minLength={3} maxLength={80} placeholder="เช่น ชมรมจักรยานริมมูล" defaultValue={club?.name} />
       </label>
 
       <label>
         อำเภอ
-        <select name="district" required defaultValue="">
+        <select name="district" required defaultValue={club?.district ?? ""}>
           <option value="" disabled>
             เลือกอำเภอ
           </option>
@@ -74,27 +76,28 @@ export function ClubForm() {
           maxLength={2000}
           rows={5}
           placeholder="ปั่นแนวไหน เส้นทางประจำ มือใหม่มาได้ไหม บรรยากาศเป็นยังไง"
+          defaultValue={club?.description}
         />
       </label>
 
       <label>
         วันเวลาปั่นประจำ (ถ้ามี)
-        <input name="regular_schedule" maxLength={100} placeholder="เช่น เสาร์–อาทิตย์ 05:30" />
+        <input name="regular_schedule" maxLength={100} placeholder="เช่น เสาร์–อาทิตย์ 05:30" defaultValue={club?.regular_schedule} />
       </label>
 
       <label>
         จุดนัดประจำ (ถ้ามี)
-        <input name="home_meet_name" maxLength={100} placeholder="เช่น หน้าทุ่งศรีเมือง" />
+        <input name="home_meet_name" maxLength={100} placeholder="เช่น หน้าทุ่งศรีเมือง" defaultValue={club?.home_meet_name} />
       </label>
 
       <fieldset>
         <legend>คนอื่นเข้ากลุ่มยังไง</legend>
         <label className="choice">
-          <input type="radio" name="join_policy" value="open" defaultChecked />
+          <input type="radio" name="join_policy" value="open" defaultChecked={club?.join_policy !== "approval"} />
           เข้าได้เลย
         </label>
         <label className="choice">
-          <input type="radio" name="join_policy" value="approval" />
+          <input type="radio" name="join_policy" value="approval" defaultChecked={club?.join_policy === "approval"} />
           แอดมินต้องอนุมัติก่อน
         </label>
       </fieldset>
@@ -104,14 +107,14 @@ export function ClubForm() {
         {(Object.keys(LINK_LABELS) as LinkKey[]).map((k) => (
           <label key={k}>
             {LINK_LABELS[k]}
-            <input name={`link_${k}`} type="url" maxLength={300} placeholder="https://" />
+            <input name={`link_${k}`} type="url" maxLength={300} placeholder="https://" defaultValue={club?.links[k]} />
           </label>
         ))}
       </fieldset>
 
       {error && <p className="error">{error}</p>}
       <button className="btn" type="submit" disabled={busy}>
-        {busy ? "กำลังสร้าง…" : "สร้างกลุ่ม"}
+        {busy ? "กำลังบันทึก…" : club ? "บันทึกการแก้ไข" : "สร้างกลุ่ม"}
       </button>
     </form>
   );
