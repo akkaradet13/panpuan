@@ -25,7 +25,10 @@
   เลื่อน/ยกเลิก/แก้ไข, live ด้วย onSnapshot), ICS ส่วนตัว `/api/cal/{token}.ics` และของกลุ่ม `/clubs/{slug}/calendar.ics`,
   ปุ่ม Google Calendar, แจ้งเตือน (FCM, prefs, รายการเครื่อง, `/install` สอน iPhone), `POST /api/notify/reminders`,
   super admin `/admin`, หน้าอำเภอ `/districts/[district]`, sitemap
-- ยังไม่ได้ทำ: Cloud Scheduler job (รอเจ้าของเปิด API + ให้ role), ทดสอบ push บนมือถือจริง, seed script (มี project เดียว
+- Cloud Scheduler job `panpuan-reminders` (asia-southeast1, ทุก 15 นาที) ทำงานแล้ว ยืนยันด้วยทริปทดสอบบนเว็บจริง
+  ถ้าเปลี่ยนโดเมนเป็น panpuan.net ต้องรัน `scripts/setup-scheduler.mjs https://panpuan.net` ใหม่
+- super admin: บัญชีเจ้าของ (ตั้งด้วย `scripts/set-super-admin.mjs`)
+- ยังไม่ได้ทำ: ทดสอบ push บนมือถือจริง, seed script (มี project เดียว
   ซึ่งเป็นของจริงด้วย จึงไม่ใส่ข้อมูลตัวอย่าง), ระบบรายงานเนื้อหา, จุดแวะ (`stops`) ของเส้นทาง, โลโก้กลุ่ม
 - ชั้น `src/app/**` เป็นตัวประสานโมดูล (เช่น `api/rides` เรียกทั้ง core, routes, rides, notify) โมดูลไม่ import กันเอง
   ยกเว้น core · component ของโมดูลหนึ่งที่ต้องใช้ UI ของอีกโมดูลรับเป็น prop/slot (เช่น `RideLive afterJoin`)
