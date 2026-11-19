@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { SiteHeader } from "@/modules/core/SiteHeader";
 import { RegisterSW } from "@/modules/notify/RegisterSW";
 import "./globals.css";
 
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="th">
       <body>
+        <SiteHeader />
         {children}
         <RegisterSW />
       </body>
