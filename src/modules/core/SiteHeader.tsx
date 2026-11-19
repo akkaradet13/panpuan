@@ -13,7 +13,9 @@ export function SiteHeader() {
         PanPuan
       </Link>
       <nav className="nav">
-        <Link href="/clubs">กลุ่มปั่น</Link>
+        <Link href="/rides">ทริป</Link>
+        <Link href="/routes">เส้นทาง</Link>
+        <Link href="/clubs">กลุ่ม</Link>
       </nav>
       {user === undefined ? <span className="avatar-slot" /> : user ? (
         <Link href="/profile" aria-label="โปรไฟล์ของฉัน">

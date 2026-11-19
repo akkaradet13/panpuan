@@ -29,7 +29,12 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = await auth.currentUser?.getIdToken();
   const res = await fetch(path, {
     ...init,
-    headers: { "content-type": "application/json", ...(token && { authorization: `Bearer ${token}` }), ...init.headers },
+    headers: {
+      // FormData bodies set their own multipart content-type
+      ...(!(init.body instanceof FormData) && { "content-type": "application/json" }),
+      ...(token && { authorization: `Bearer ${token}` }),
+      ...init.headers,
+    },
   });
   const body = await res.json().catch(() => null);
   if (!res.ok) throw new Error(body?.error ?? "เกิดข้อผิดพลาด ลองใหม่อีกครั้ง");

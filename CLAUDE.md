@@ -273,10 +273,10 @@ notify_log              (notify) กันแจ้งซ้ำ id = {ride_id}_{
 **สร้างกลุ่ม** — `POST /api/clubs`
 - สร้าง `clubs` และ `club_members` (role `admin`) ใน transaction เดียว client ห้ามเขียน `club_members` เอง
 
-**เพิ่มเส้นทาง** — อัปโหลด GPX ไป `uploads/{uid}/...` (`storage.rules` จำกัดขนาด ≤ 5 MB และ path ของ uid ตัวเอง)
-แล้วเรียก `POST /api/routes` → parse GPX ฝั่งเซิร์ฟเวอร์ → คำนวณระยะ/ความสูง/จุดเริ่ม → เก็บ polyline
-→ **คัดลอกไฟล์ไป `routes/{route_id}.gpx`** (client เขียนไม่ได้ กันการแอบเปลี่ยนไฟล์หลังยืนยัน) แล้วลบไฟล์ใน uploads
-ไฟล์ใน `uploads/` ที่ค้างอยู่ลบเองด้วย lifecycle rule (1 วัน)
+**เพิ่มเส้นทาง** — client ส่งไฟล์ GPX ตรงไปที่ `POST /api/routes` (multipart, ≤ 5 MB) **ไม่เขียน Storage เอง**
+→ parse GPX ฝั่งเซิร์ฟเวอร์ (`routes/gpx.ts` เขียนเอง ไม่ใช้ lib) → คำนวณระยะ/ความสูง/จุดเริ่ม → เก็บ polyline (RDP ≤ 1500 จุด)
+→ เซิร์ฟเวอร์เขียนไฟล์ไป `routes/{route_id}.gpx` (client เขียนไม่ได้ กันการแอบเปลี่ยนไฟล์หลังยืนยัน)
+ดาวน์โหลดผ่าน URL สาธารณะของ Firebase Storage (`gpxUrl()`) · path `uploads/` ใน rules ยังเปิดไว้สำหรับรูปในอนาคต
 
 ## Google Calendar (Phase 1)
 
