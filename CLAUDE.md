@@ -7,13 +7,17 @@
 ไฟล์นี้สรุปบริบทและข้อตกลงของโปรเจกต์ เพื่อให้ Claude Code ทำงานต่อได้โดยไม่ต้องถามซ้ำ
 สถานะปัจจุบัน (2026-11-19): **Phase 1 กำลังทำ**
 - เสร็จ: โครงโปรเจกต์, PWA shell, Login Google (`/login`), หน้าโปรไฟล์ (`/profile`, `GET/PATCH /api/me`)
+- เสร็จ: กลุ่ม `/clubs`, `/clubs/new`, `/clubs/[slug]` (slug ไทย, JSON-LD, noindex ถ้ายังไม่ยืนยัน), sitemap
+  API: `POST /api/clubs`, `POST|DELETE /api/clubs/{id}/join`, `PATCH /api/clubs/{id}/members/{uid}` (approve/promote/demote/remove)
+  ตรรกะอยู่ที่ `src/modules/core/clubs.ts` · error ใน Route Handler ใช้ `HttpError` + `handle()` จาก `core/http.ts`
+- ยังไม่มีในกลุ่ม: แก้ข้อมูลกลุ่ม, โลโก้กลุ่ม, ปักหมุดจุดนัดบนแผนที่ (รอ Leaflet ตอนทำเส้นทาง)
 - Firebase project: `panpuan-a4f37` (ใช้เป็น dev ยังไม่มี prod) · service account อยู่นอก repo ตาม `.env.local`
 - App Hosting backend `panpuan` (asia-southeast1) เชื่อม GitHub: **push ขึ้น `main` = deploy อัตโนมัติ**
   URL: https://panpuan--panpuan-a4f37.asia-southeast1.hosted.app
 - rules/indexes/TTL deploy ด้วย `firebase deploy --only firestore,storage` (CLI ใช้ service account ใน `GOOGLE_APPLICATION_CREDENTIALS`)
 - ผู้ใช้ทดสอบของ Claude: uid `claude-test` ขอ ID token ด้วย `node --env-file=.env.local scripts/dev-token.mjs`
   ใช้ทดสอบ API ได้โดยไม่ต้อง login Google · กลุ่มทดสอบให้ใช้ชื่อ "กลุ่มทดสอบของ Claude"
-- ถัดไป: กลุ่ม (สร้าง, หน้ากลุ่ม, เข้ากลุ่ม, จัดการสมาชิก)
+- ถัดไป: แก้ข้อมูลกลุ่ม → เส้นทาง (GPX, แผนที่) → ทริป
 
 โปรเจกต์นี้ใช้ stack และแนวทางเดียวกับเว็บ **วัด (Wat)** ของเจ้าของ (Next.js + Firebase App Hosting)
 ข้อควรระวังหลายข้อด้านล่างได้มาจากการทำเว็บวัดจริง ให้เชื่อตามนี้ก่อน

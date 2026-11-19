@@ -12,7 +12,10 @@ export function SiteHeader() {
         <Image src="/icon-192.png" width={36} height={36} alt="" priority />
         PanPuan
       </Link>
-      {user === undefined ? null : user ? (
+      <nav className="nav">
+        <Link href="/clubs">กลุ่มปั่น</Link>
+      </nav>
+      {user === undefined ? <span className="avatar-slot" /> : user ? (
         <Link href="/profile" aria-label="โปรไฟล์ของฉัน">
           <Image className="avatar" src={user.photoURL || "/icon-192.png"} width={36} height={36} alt="" />
         </Link>
