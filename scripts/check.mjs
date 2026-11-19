@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { decodePolyline } from "../src/modules/core/polyline.ts";
 import { bangkokParts, bangkokToUtc, dayLabel, fmtDate, fmtTime } from "../src/modules/core/format.ts";
 import { elevationGainM, encodePolyline, gpxStats, parseGpx, simplify } from "../src/modules/routes/gpx.ts";
+import { buildIcs, gcalUrl, icsEscape, icsFold, rideHours } from "../src/modules/rides/ics.ts";
 
 // polyline round trip (Google's documented example)
 assert.equal(encodePolyline([{ lat: 38.5, lng: -120.2 }, { lat: 40.7, lng: -120.95 }, { lat: 43.252, lng: -126.453 }]), "_p~iF~ps|U_ulLnnqC_mqNvxq`@");
@@ -41,5 +42,19 @@ assert.equal(fmtDate(d), "เสาร์ 21 พ.ย. 2569");
 assert.equal(dayLabel(d, new Date("2026-11-20T03:00:00Z")), "พรุ่งนี้ · เสาร์ 21 พ.ย. 2569");
 assert.deepEqual(bangkokParts(d), { day: "2026-11-21", hour: 5, minute: 30 });
 assert.equal(fmtTime(bangkokToUtc("2026-11-21", 18, 0)), "18:00");
+
+// ICS: escaping, UTF-8-safe folding, cancelled events, ride duration, Google Calendar link
+assert.equal(icsEscape("a,b;c\\d\ne"), "a\\,b\\;c\\\\d\\ne");
+const longThai = "SUMMARY:" + "ปั่นจักรยานริมโขง".repeat(10);
+const folded = icsFold(longThai);
+for (const l of folded.split("\r\n")) assert.ok(new TextEncoder().encode(l).length <= 75, "line within 75 octets");
+assert.equal(folded.split("\r\n ").join(""), longThai, "unfolding restores the line");
+const ics = buildIcs("ทดสอบ", [{ uid: "r1@panpuan.net", start: d, end: new Date(d.getTime() + 3 * 3600e3), title: "ปั่นเช้า", cancelled: true }], new Date(0));
+assert.ok(ics.includes("DTSTART:20261120T223000Z\r\n"));
+assert.ok(ics.includes("STATUS:CANCELLED") && ics.includes("SUMMARY:[ยกเลิก] ปั่นเช้า"));
+assert.ok(ics.endsWith("END:VCALENDAR\r\n") && !/[^\r]\n/.test(ics), "CRLF only");
+assert.equal(rideHours(null, 20, 25), 3);
+assert.equal(rideHours(45, 20, 25), 2.5); // 2h + 0.5h stops
+assert.ok(gcalUrl({ title: "ปั่น", start: d, end: d }).includes("dates=20261120T223000Z%2F20261120T223000Z"));
 
 console.log("all checks passed");

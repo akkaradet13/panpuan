@@ -86,6 +86,39 @@ export async function getClubBySlug(slug: string): Promise<Club | null> {
   return d && d.get("status") !== "suspended" ? toClub(d) : null;
 }
 
+export type ClubRef = { id: string; name: string; slug: string; status: Club["status"] };
+
+/**
+ * For other modules (rides): returns the club if the user is an active admin (or super admin) and the club is
+ * not suspended; throws otherwise. One read of clubs + one of club_members by id.
+ */
+export async function requireClubAdmin(clubId: string, actor: DecodedIdToken): Promise<ClubRef> {
+  const [club, me] = await adminDb.getAll(clubs.doc(clubId), members.doc(memberId(clubId, actor.uid)));
+  assertCanAdmin(club, me, actor);
+  return { id: club.id, name: club.get("name"), slug: club.get("slug"), status: club.get("status") };
+}
+
+export async function getClub(id: string): Promise<Club | null> {
+  const d = await clubs.doc(id).get();
+  return d.exists && d.get("status") !== "suspended" ? toClub(d) : null;
+}
+
+export async function listClubsByStatus(status: Club["status"]): Promise<Club[]> {
+  return (await clubs.where("status", "==", status).get()).docs.map(toClub);
+}
+
+/** Super admin only (checked by the caller). */
+export async function setClubStatus(id: string, status: Club["status"], by: string) {
+  const ref = clubs.doc(id);
+  if (!(await ref.get()).exists) throw new HttpError(404, "ไม่พบกลุ่มนี้");
+  await ref.update({
+    status,
+    verified_by: status === "verified" ? by : null,
+    verified_at: status === "verified" ? FieldValue.serverTimestamp() : null,
+    updated_at: FieldValue.serverTimestamp(),
+  });
+}
+
 /** All non-suspended clubs, biggest first. ponytail: full scan, fine for hundreds of clubs. */
 export async function listClubs(): Promise<Club[]> {
   const snap = await clubs.where("status", "in", ["unverified", "verified"]).get();

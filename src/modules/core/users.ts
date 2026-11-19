@@ -60,6 +60,18 @@ export function parseProfileUpdate(body: unknown): ProfileUpdate | string {
   return out;
 }
 
+/** For the personal ICS feed. */
+export async function getUidByCalendarToken(token: string): Promise<string | null> {
+  if (token.length < 20) return null;
+  return (await users.where("calendar_token", "==", token).limit(1).get()).docs[0]?.id ?? null;
+}
+
+export async function resetCalendarToken(uid: string) {
+  const calendar_token = newCalendarToken();
+  await users.doc(uid).update({ calendar_token, updated_at: FieldValue.serverTimestamp() });
+  return calendar_token;
+}
+
 export async function updateUser(uid: string, update: ProfileUpdate) {
   await users.doc(uid).update({ ...update, updated_at: FieldValue.serverTimestamp() });
 }

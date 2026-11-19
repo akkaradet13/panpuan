@@ -21,7 +21,15 @@
 - rules/indexes/TTL deploy ด้วย `firebase deploy --only firestore,storage` (CLI ใช้ service account ใน `GOOGLE_APPLICATION_CREDENTIALS`)
 - ผู้ใช้ทดสอบของ Claude: uid `claude-test` ขอ ID token ด้วย `node --env-file=.env.local scripts/dev-token.mjs`
   ใช้ทดสอบ API ได้โดยไม่ต้อง login Google · กลุ่มทดสอบให้ใช้ชื่อ "กลุ่มทดสอบของ Claude"
-- ถัดไป: เส้นทาง (GPX, แผนที่) → ทริป
+- เสร็จ (Phase 1 ครบในโค้ด): เส้นทาง (`/routes`, GPX, แผนที่ Leaflet, รีวิว, OG image), ทริป (`/rides`, ลงชื่อ/คิวรอ/
+  เลื่อน/ยกเลิก/แก้ไข, live ด้วย onSnapshot), ICS ส่วนตัว `/api/cal/{token}.ics` และของกลุ่ม `/clubs/{slug}/calendar.ics`,
+  ปุ่ม Google Calendar, แจ้งเตือน (FCM, prefs, รายการเครื่อง, `/install` สอน iPhone), `POST /api/notify/reminders`,
+  super admin `/admin`, หน้าอำเภอ `/districts/[district]`, sitemap
+- ยังไม่ได้ทำ: Cloud Scheduler job (รอเจ้าของเปิด API + ให้ role), ทดสอบ push บนมือถือจริง, seed script (มี project เดียว
+  ซึ่งเป็นของจริงด้วย จึงไม่ใส่ข้อมูลตัวอย่าง), ระบบรายงานเนื้อหา, จุดแวะ (`stops`) ของเส้นทาง, โลโก้กลุ่ม
+- ชั้น `src/app/**` เป็นตัวประสานโมดูล (เช่น `api/rides` เรียกทั้ง core, routes, rides, notify) โมดูลไม่ import กันเอง
+  ยกเว้น core · component ของโมดูลหนึ่งที่ต้องใช้ UI ของอีกโมดูลรับเป็น prop/slot (เช่น `RideLive afterJoin`)
+- ทดสอบ: `node scripts/check.mjs` (ตรรกะล้วน) และ e2e ด้วยผู้ใช้ `claude-test` + ผู้ใช้ชั่วคราว ลบข้อมูลทดสอบทุกครั้ง
 
 โปรเจกต์นี้ใช้ stack และแนวทางเดียวกับเว็บ **วัด (Wat)** ของเจ้าของ (Next.js + Firebase App Hosting)
 ข้อควรระวังหลายข้อด้านล่างได้มาจากการทำเว็บวัดจริง ให้เชื่อตามนี้ก่อน
@@ -311,7 +319,8 @@ notify_log              (notify) กันแจ้งซ้ำ id = {ride_id}_{
     `d1` เมื่อเหลือ ≤ 24 ชม. (ข้ามถ้าทริปสร้างภายใน 24 ชม. ก่อนเริ่ม) · `h1` เมื่อเหลือ ≤ 60 นาที
   - ส่งเฉพาะผู้ลงชื่อ `going` ที่ `notify_prefs.ride_reminder` ไม่ใช่ false
   - Scheduler รันซ้ำหรือช้าได้ ความถูกต้องอาศัย `notify_log` ไม่ใช่ช่วงเวลาที่แม่นยำ
-  - การตั้ง Scheduler อยู่ในสคริปต์ใน repo (`scripts/setup-scheduler.sh`)
+  - การตั้ง Scheduler อยู่ในสคริปต์ใน repo (`scripts/setup-scheduler.mjs` ใช้ REST API ไม่ต้องมี gcloud)
+  - เพื่อประหยัด read: แต่ละรอบดูเฉพาะทริปที่เริ่มในอีก ≤ 60 นาที (h1) และ 22–24 ชม. (d1) ไม่สแกน 0–24 ชม. ทั้งหมด
 
 **จังหวะชวนติดตั้งและเปิดแจ้งเตือน**
 - ห้ามขอสิทธิ์แจ้งเตือนตอนเปิดเว็บ ขอเมื่อผู้ใช้กดปุ่มเองเท่านั้น (iOS บังคับ)

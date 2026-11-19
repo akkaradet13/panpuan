@@ -16,6 +16,6 @@ env:
     value: "921170140914"
   - variable: NEXT_PUBLIC_FIREBASE_APP_ID
     value: "1:921170140914:web:4de1d2939b1e5f138eba6b"
-  # Added with the notify module (POST /api/notify/reminders):
-  # - variable: CRON_SECRET
-  #   secret: cron-secret
+  # Shared with Cloud Scheduler (scripts/setup-scheduler.mjs) to call POST /api/notify/reminders
+  - variable: CRON_SECRET
+    secret: cron-secret

@@ -110,4 +110,24 @@ a.chip { color: inherit; text-decoration: none; }
 .review { padding: 12px 0; border-top: 1px solid color-mix(in srgb, var(--muted) 25%, transparent); }
 .review p { margin: 6px 0 0; }
 
+.banner { margin: 0; padding: 12px 14px; border-radius: 12px; font-weight: 600; background: color-mix(in srgb, var(--accent) 22%, transparent); }
+.banner-bad { background: color-mix(in srgb, #d93025 18%, transparent); }
+.count { margin: 0; font-size: 1.1rem; }
+.count strong { font-size: 2rem; color: var(--brand); }
+h3.day { margin: 8px 0 0; font-size: 1rem; color: var(--muted); }
+.list-item .time { font-weight: 800; color: var(--brand); margin-right: 8px; }
+.row.time { gap: 4px; flex-wrap: nowrap; font-weight: 400; }
+.steps { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.step { display: flex; gap: 12px; align-items: flex-start; }
+.step p { margin: 4px 0 0; }
+.step-n {
+  flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--brand); color: #fff; font-weight: 800;
+}
+.ios-icon { color: #0a84ff; flex: none; }
+@media (max-width: 420px) {
+  .nav { margin-left: 10px; gap: 12px; font-size: 0.95rem; }
+  .brand { font-size: 0; gap: 0; }
+}
+
 .chip:has(input:checked) { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, transparent); }

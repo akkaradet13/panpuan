@@ -30,15 +30,26 @@ npm run dev                         # http://localhost:3000
    หลังจากนั้น **push ขึ้น `main` = deploy อัตโนมัติ**
 8. Authentication → Settings → Authorized domains: เพิ่มโดเมน `*.hosted.app` ของ backend และ panpuan.net
 9. เชื่อมโดเมน panpuan.net ใน App Hosting
-
-## ทดสอบ API
-
-ผู้ใช้ทดสอบ `claude-test` (ชื่อ "Claude ทดสอบ") มีอยู่ใน dev project ใช้สคริปต์นี้ขอ ID token:
-
-```bash
-node --env-file=.env.local scripts/dev-token.mjs
-```
+10. **เตือนก่อนทริป (Cloud Scheduler)**
+    - สุ่ม secret ยาว ≥ 16 ตัวใส่ `.env.local` เป็น `CRON_SECRET=...`
+    - เก็บใน Secret Manager: `firebase apphosting:secrets:set cron-secret` (ใส่ค่าเดียวกัน) แล้ว
+      `firebase apphosting:secrets:grantaccess cron-secret --backend <backend>`
+    - เปิด Cloud Scheduler API และให้ service account ใน `.env.local` มี role **Cloud Scheduler Admin**
+    - สร้างงาน (ทุก 15 นาที): `node --env-file=.env.local scripts/setup-scheduler.mjs https://<โดเมนเว็บ>`
+      รันซ้ำได้ (อัปเดตงานเดิม) ต้องรันใหม่เมื่อเปลี่ยนโดเมนหรือ secret
 
 ## ตั้ง super admin
 
-ตั้ง custom claim `super_admin: true` ฝั่งเซิร์ฟเวอร์ (สคริปต์จะเพิ่มพร้อมระบบ super admin ใน Phase 1)
+```bash
+node --env-file=.env.local scripts/set-super-admin.mjs someone@gmail.com           # เพิ่ม
+node --env-file=.env.local scripts/set-super-admin.mjs someone@gmail.com --remove  # ถอด
+```
+ผู้ใช้ต้องออกจากระบบแล้วเข้าใหม่ (หรือรอไม่เกิน 1 ชม.) แล้วจะเห็นปุ่ม "คิวยืนยัน" ในหน้าโปรไฟล์ (`/admin`)
+
+## ทดสอบ
+
+```bash
+node scripts/check.mjs                                 # ตรรกะล้วน: GPX, polyline, วันเวลาไทย, ICS
+node --env-file=.env.local scripts/dev-token.mjs       # ID token ของผู้ใช้ทดสอบ claude-test ไว้เรียก API
+```
+การแจ้งเตือนจริงต้องทดสอบบนมือถือ (Playwright subscribe push ไม่ได้)

@@ -5,6 +5,8 @@ import { cache } from "react";
 import { LINK_LABELS, type LinkKey } from "@/modules/core/club-types";
 import { ClubMembership } from "@/modules/core/ClubMembership";
 import { getClubBySlug } from "@/modules/core/clubs";
+import { RideList } from "@/modules/rides/RideList";
+import { listUpcomingRides } from "@/modules/rides/rides";
 
 export const revalidate = 60;
 
@@ -39,6 +41,7 @@ export async function generateMetadata({ params }: PageProps<"/clubs/[slug]">): 
 export default async function ClubPage({ params }: PageProps<"/clubs/[slug]">) {
   const club = await loadClub((await params).slug);
   if (!club) notFound();
+  const rides = await listUpcomingRides({ clubId: club.id, limit: 20 });
 
   const url = `https://panpuan.net/clubs/${encodeURIComponent(club.slug)}`;
   const links = (Object.keys(LINK_LABELS) as LinkKey[]).filter((k) => club.links[k]);
@@ -81,6 +84,14 @@ export default async function ClubPage({ params }: PageProps<"/clubs/[slug]">) {
       </div>
 
       <ClubMembership clubId={club.id} slug={club.slug} joinPolicy={club.join_policy} />
+
+      <section className="stack">
+        <h2>ทริปที่กำลังจะมาถึง</h2>
+        <RideList rides={rides} empty="ยังไม่มีทริปที่กำลังจะมาถึง" />
+        <a href={`/clubs/${encodeURIComponent(club.slug)}/calendar.ics`} className="muted">
+          📆 ปฏิทินของกลุ่ม (.ics) — คัดลอกลิงก์ไปเพิ่มใน Google Calendar
+        </a>
+      </section>
 
       <section>
         <h2>เกี่ยวกับกลุ่ม</h2>
